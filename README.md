@@ -30,7 +30,7 @@ Current focus:
 
 The requirements definition is stored at:
 
-- [docs/accay_requirements_v8.md](docs/accay_requirements_v8.md)
+- [docs/requirements.md](docs/requirements.md)
 
 ## Planned CLI
 
