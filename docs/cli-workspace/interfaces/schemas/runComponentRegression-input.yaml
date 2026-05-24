@@ -1,0 +1,13 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: runComponentRegression input
+type: object
+additionalProperties: false
+properties:
+  root:
+    type: string
+  component:
+    type: string
+  junit_paths:
+    type: array
+    items:
+      type: string

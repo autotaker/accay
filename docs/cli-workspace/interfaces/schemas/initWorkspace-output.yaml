@@ -1,0 +1,20 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: initWorkspace output
+type: object
+additionalProperties: false
+properties:
+  exit_code:
+    type: integer
+  created_paths:
+    type: array
+    items:
+      type: string
+  existing_paths:
+    type: array
+    items:
+      type: string
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

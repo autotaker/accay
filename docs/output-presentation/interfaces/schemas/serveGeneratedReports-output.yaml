@@ -1,0 +1,12 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: serveGeneratedReports output
+type: object
+additionalProperties: false
+properties:
+  url:
+    type: string
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

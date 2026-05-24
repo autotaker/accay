@@ -1,0 +1,24 @@
+component: system-artifacts
+
+operations:
+  discoverSystemArtifacts:
+    kind: function
+    signature: discoverSystemArtifacts(workspace)
+    input:
+      schema_ref: docs/system-artifacts/interfaces/schemas/discoverSystemArtifacts-input.yaml
+    output:
+      schema_ref: docs/system-artifacts/interfaces/schemas/discoverSystemArtifacts-output.yaml
+  loadScenarioArtifacts:
+    kind: function
+    signature: loadScenarioArtifacts(workspace, scenario)
+    input:
+      schema_ref: docs/system-artifacts/interfaces/schemas/loadScenarioArtifacts-input.yaml
+    output:
+      schema_ref: docs/system-artifacts/interfaces/schemas/loadScenarioArtifacts-output.yaml
+  loadTraceArtifact:
+    kind: function
+    signature: loadTraceArtifact(workspace, trace_path)
+    input:
+      schema_ref: docs/system-artifacts/interfaces/schemas/loadTraceArtifact-input.yaml
+    output:
+      schema_ref: docs/system-artifacts/interfaces/schemas/loadTraceArtifact-output.yaml

@@ -1,0 +1,103 @@
+component: cli-workspace
+
+operations:
+  initWorkspace:
+    kind: cli
+    command: accay init
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/initWorkspace-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/initWorkspace-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]
+  installSkills:
+    kind: cli
+    command: accay install
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/installSkills-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/installSkills-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]
+  validateWorkspace:
+    kind: cli
+    command: accay validate
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/validateWorkspace-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/validateWorkspace-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]
+  validateSystem:
+    kind: cli
+    command: accay system validate
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/validateSystem-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/validateSystem-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]
+  validateComponent:
+    kind: cli
+    command: accay component validate <component>
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/validateComponent-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/validateComponent-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]
+  packDeskDebugContext:
+    kind: cli
+    command: accay system pack desk-debug --scenario <scenario>
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/packDeskDebugContext-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/packDeskDebugContext-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]
+  packReviewContext:
+    kind: cli
+    command: accay component pack review <component> --case <case-id>
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/packReviewContext-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/packReviewContext-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]
+  runRegression:
+    kind: cli
+    command: accay regression --junit <path>
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/runRegression-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/runRegression-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]
+  runComponentRegression:
+    kind: cli
+    command: accay component regression <component> --junit <path>
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/runComponentRegression-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/runComponentRegression-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]
+  serveReports:
+    kind: cli
+    command: accay serve
+    input:
+      schema_ref: docs/cli-workspace/interfaces/schemas/serveReports-input.yaml
+    output:
+      schema_ref: docs/cli-workspace/interfaces/schemas/serveReports-output.yaml
+    exit_codes:
+      success: [0]
+      failure: [1]

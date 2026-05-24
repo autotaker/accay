@@ -1,0 +1,15 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: lookupOperation output
+type: object
+additionalProperties: false
+properties:
+  found:
+    type: boolean
+  operation_contract:
+    type: object
+    additionalProperties: true
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

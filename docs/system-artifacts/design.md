@@ -6,6 +6,11 @@ System Artifacts は、system side の正本成果物を読み取り、System Ha
 
 対象は、業務シナリオ、シナリオ説明、机上デバッグ trace である。component の acceptance-scope や test-map は読まない。
 
+## 1.1 Interface semantics
+
+公開 operation の意味論は [semantics.md](semantics.md) を正本とする。
+この design は、その意味論を artifact discovery、YAML 読み取り、source location の保持としてどう実現するかを定義する。
+
 ## 2. 正本ファイル
 
 ```text

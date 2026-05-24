@@ -1,0 +1,12 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: writeReviewContext input
+type: object
+additionalProperties: false
+properties:
+  context_source:
+    type: object
+    additionalProperties: true
+  run_id:
+    type: string
+  runs_dir:
+    type: string

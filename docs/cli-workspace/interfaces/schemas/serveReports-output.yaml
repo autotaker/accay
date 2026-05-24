@@ -1,0 +1,14 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: serveReports output
+type: object
+additionalProperties: false
+properties:
+  exit_code:
+    type: integer
+  url:
+    type: string
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

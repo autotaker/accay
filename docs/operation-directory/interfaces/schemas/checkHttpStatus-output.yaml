@@ -1,0 +1,16 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: checkHttpStatus output
+type: object
+additionalProperties: false
+properties:
+  allowed:
+    type: boolean
+  allowed_statuses:
+    type: array
+    items:
+      type: integer
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

@@ -1,0 +1,31 @@
+component: component-artifacts
+
+operations:
+  discoverComponents:
+    kind: function
+    signature: discoverComponents(workspace)
+    input:
+      schema_ref: docs/component-artifacts/interfaces/schemas/discoverComponents-input.yaml
+    output:
+      schema_ref: docs/component-artifacts/interfaces/schemas/discoverComponents-output.yaml
+  loadComponentArtifacts:
+    kind: function
+    signature: loadComponentArtifacts(workspace, component)
+    input:
+      schema_ref: docs/component-artifacts/interfaces/schemas/loadComponentArtifacts-input.yaml
+    output:
+      schema_ref: docs/component-artifacts/interfaces/schemas/loadComponentArtifacts-output.yaml
+  loadAcceptanceScope:
+    kind: function
+    signature: loadAcceptanceScope(component_path)
+    input:
+      schema_ref: docs/component-artifacts/interfaces/schemas/loadAcceptanceScope-input.yaml
+    output:
+      schema_ref: docs/component-artifacts/interfaces/schemas/loadAcceptanceScope-output.yaml
+  loadTestMap:
+    kind: function
+    signature: loadTestMap(component_path)
+    input:
+      schema_ref: docs/component-artifacts/interfaces/schemas/loadTestMap-input.yaml
+    output:
+      schema_ref: docs/component-artifacts/interfaces/schemas/loadTestMap-output.yaml

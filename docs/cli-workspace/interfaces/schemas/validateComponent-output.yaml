@@ -1,0 +1,12 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: validateComponent output
+type: object
+additionalProperties: false
+properties:
+  exit_code:
+    type: integer
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

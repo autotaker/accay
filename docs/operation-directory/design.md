@@ -6,6 +6,11 @@ Operation Directory は、system と component の唯一の機械的な接続点
 
 component の interface 成果物から operation catalog と schema registry を作り、`component + operation` で参照できるようにする。意味判断や受け入れ判断は行わない。
 
+## 1.1 Interface semantics
+
+公開 operation の意味論は [semantics.md](semantics.md) を正本とする。
+この design は、その意味論を catalog 構築、schema ref 解決、status / exit code 照合としてどう実現するかを定義する。
+
 ## 2. 責務境界
 
 ### 責務

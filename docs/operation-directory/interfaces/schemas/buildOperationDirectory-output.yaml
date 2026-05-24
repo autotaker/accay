@@ -1,0 +1,13 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: buildOperationDirectory output
+type: object
+additionalProperties: false
+properties:
+  catalog:
+    type: object
+    additionalProperties: true
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

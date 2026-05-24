@@ -1,0 +1,13 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: buildDeskDebugContextSource input
+type: object
+additionalProperties: false
+properties:
+  scenario:
+    type: string
+  system_artifacts:
+    type: object
+    additionalProperties: true
+  operation_directory:
+    type: object
+    additionalProperties: true

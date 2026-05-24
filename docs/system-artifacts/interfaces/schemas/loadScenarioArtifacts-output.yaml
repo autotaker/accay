@@ -1,0 +1,23 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: loadScenarioArtifacts output
+type: object
+additionalProperties: false
+properties:
+  scenario_id:
+    type: string
+  scenario_path:
+    type: string
+  sequence_path:
+    type: string
+  trace_path:
+    type: string
+  trace_steps:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

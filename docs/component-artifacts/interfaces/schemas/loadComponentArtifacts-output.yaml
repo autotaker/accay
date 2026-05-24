@@ -1,0 +1,22 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: loadComponentArtifacts output
+type: object
+additionalProperties: false
+properties:
+  component:
+    type: string
+  scope:
+    type: object
+    additionalProperties: true
+  test_map:
+    type: object
+    additionalProperties: true
+  semantics_path:
+    type: string
+  interfaces_path:
+    type: string
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

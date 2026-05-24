@@ -6,6 +6,11 @@ Component Regression は、JUnit XML と `test-map.yaml` を照合し、componen
 
 system trace は直接の入力にしない。top-level regression は、全 component の regression result を集約するだけである。
 
+## 1.1 Interface semantics
+
+公開 operation の意味論は [semantics.md](semantics.md) を正本とする。
+この design は、その意味論を JUnit result set、test-map matching、case-level aggregation としてどう実現するかを定義する。
+
 ## 2. 責務境界
 
 ### 責務

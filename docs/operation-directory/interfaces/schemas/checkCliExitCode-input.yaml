@@ -1,0 +1,11 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: checkCliExitCode input
+type: object
+additionalProperties: false
+properties:
+  component:
+    type: string
+  operation:
+    type: string
+  exit_code:
+    type: integer

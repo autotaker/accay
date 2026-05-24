@@ -1,0 +1,17 @@
+component: system-harness
+
+operations:
+  validateSystemArtifacts:
+    kind: function
+    signature: validateSystemArtifacts(system_artifacts, operation_directory)
+    input:
+      schema_ref: docs/system-harness/interfaces/schemas/validateSystemArtifacts-input.yaml
+    output:
+      schema_ref: docs/system-harness/interfaces/schemas/validateSystemArtifacts-output.yaml
+  buildDeskDebugContextSource:
+    kind: function
+    signature: buildDeskDebugContextSource(system_artifacts, operation_directory)
+    input:
+      schema_ref: docs/system-harness/interfaces/schemas/buildDeskDebugContextSource-input.yaml
+    output:
+      schema_ref: docs/system-harness/interfaces/schemas/buildDeskDebugContextSource-output.yaml

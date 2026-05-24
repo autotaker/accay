@@ -1,0 +1,16 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: packDeskDebugContext output
+type: object
+additionalProperties: false
+properties:
+  exit_code:
+    type: integer
+  run_id:
+    type: string
+  context_path:
+    type: string
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

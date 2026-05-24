@@ -6,6 +6,11 @@ Output & Presentation は、diagnostics、context source、regression result を
 
 表示とファイル出力だけを担当し、validation / regression の本体ロジックは持たない。
 
+## 1.1 Interface semantics
+
+公開 operation の意味論は [semantics.md](semantics.md) を正本とする。
+この design は、その意味論を diagnostics formatting、context rendering、report rendering、local viewer としてどう実現するかを定義する。
+
 ## 2. 責務境界
 
 ### 責務

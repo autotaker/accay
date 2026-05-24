@@ -1,0 +1,11 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: matchTestMap input
+type: object
+additionalProperties: false
+properties:
+  test_map:
+    type: object
+    additionalProperties: true
+  junit_result_set:
+    type: object
+    additionalProperties: true

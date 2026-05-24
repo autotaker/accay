@@ -6,6 +6,11 @@ CLI & Workspace は、Accay の利用者が触れる入口であり、各 compon
 
 この component は、repository root、設定、command line option を確定し、必要な処理を適切な component に委譲する。validation、regression、report rendering の本体ロジックは持たない。
 
+## 1.1 Interface semantics
+
+公開 operation の意味論は [semantics.md](semantics.md) を正本とする。
+この design は、その意味論を CLI orchestration、workspace 解決、exit code、他 component への委譲としてどう実現するかを定義する。
+
 ## 2. 責務境界
 
 ### 責務

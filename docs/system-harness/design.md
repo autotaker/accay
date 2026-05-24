@@ -6,6 +6,11 @@ System Harness は、system side の validation と desk-debug context の材料
 
 system side は、業務シナリオがどの operation 列として流れるかを扱う。component の受け入れケースや test-map には依存しない。
 
+## 1.1 Interface semantics
+
+公開 operation の意味論は [semantics.md](semantics.md) を正本とする。
+この design は、その意味論を system validation、Operation Directory lookup、schema validation、context source 選定としてどう実現するかを定義する。
+
 ## 2. 責務境界
 
 ### 責務

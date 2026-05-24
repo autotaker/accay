@@ -1,0 +1,13 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: serveReports input
+type: object
+additionalProperties: false
+properties:
+  root:
+    type: string
+  report_dir:
+    type: string
+  host:
+    type: string
+  port:
+    type: integer

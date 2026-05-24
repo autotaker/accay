@@ -1,0 +1,14 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: writeRegressionReports output
+type: object
+additionalProperties: false
+properties:
+  markdown_path:
+    type: string
+  html_path:
+    type: string
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

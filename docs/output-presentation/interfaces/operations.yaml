@@ -1,0 +1,38 @@
+component: output-presentation
+
+operations:
+  renderDiagnosticsSummary:
+    kind: function
+    signature: renderDiagnosticsSummary(diagnostics)
+    input:
+      schema_ref: docs/output-presentation/interfaces/schemas/renderDiagnosticsSummary-input.yaml
+    output:
+      schema_ref: docs/output-presentation/interfaces/schemas/renderDiagnosticsSummary-output.yaml
+  writeDeskDebugContext:
+    kind: function
+    signature: writeDeskDebugContext(context_source, run)
+    input:
+      schema_ref: docs/output-presentation/interfaces/schemas/writeDeskDebugContext-input.yaml
+    output:
+      schema_ref: docs/output-presentation/interfaces/schemas/writeDeskDebugContext-output.yaml
+  writeReviewContext:
+    kind: function
+    signature: writeReviewContext(context_source, run)
+    input:
+      schema_ref: docs/output-presentation/interfaces/schemas/writeReviewContext-input.yaml
+    output:
+      schema_ref: docs/output-presentation/interfaces/schemas/writeReviewContext-output.yaml
+  writeRegressionReports:
+    kind: function
+    signature: writeRegressionReports(regression_result, report_dirs)
+    input:
+      schema_ref: docs/output-presentation/interfaces/schemas/writeRegressionReports-input.yaml
+    output:
+      schema_ref: docs/output-presentation/interfaces/schemas/writeRegressionReports-output.yaml
+  serveGeneratedReports:
+    kind: function
+    signature: serveGeneratedReports(report_dir, bind)
+    input:
+      schema_ref: docs/output-presentation/interfaces/schemas/serveGeneratedReports-input.yaml
+    output:
+      schema_ref: docs/output-presentation/interfaces/schemas/serveGeneratedReports-output.yaml

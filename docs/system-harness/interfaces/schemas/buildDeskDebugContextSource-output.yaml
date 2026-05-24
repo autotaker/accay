@@ -1,0 +1,13 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: buildDeskDebugContextSource output
+type: object
+additionalProperties: false
+properties:
+  context_source:
+    type: object
+    additionalProperties: true
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

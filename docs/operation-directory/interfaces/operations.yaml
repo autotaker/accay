@@ -1,0 +1,45 @@
+component: operation-directory
+
+operations:
+  buildOperationDirectory:
+    kind: function
+    signature: buildOperationDirectory(component_interfaces)
+    input:
+      schema_ref: docs/operation-directory/interfaces/schemas/buildOperationDirectory-input.yaml
+    output:
+      schema_ref: docs/operation-directory/interfaces/schemas/buildOperationDirectory-output.yaml
+  lookupOperation:
+    kind: function
+    signature: lookupOperation(component, operation)
+    input:
+      schema_ref: docs/operation-directory/interfaces/schemas/lookupOperation-input.yaml
+    output:
+      schema_ref: docs/operation-directory/interfaces/schemas/lookupOperation-output.yaml
+  resolveInputSchema:
+    kind: function
+    signature: resolveInputSchema(component, operation)
+    input:
+      schema_ref: docs/operation-directory/interfaces/schemas/resolveInputSchema-input.yaml
+    output:
+      schema_ref: docs/operation-directory/interfaces/schemas/resolveInputSchema-output.yaml
+  resolveOutputSchema:
+    kind: function
+    signature: resolveOutputSchema(component, operation)
+    input:
+      schema_ref: docs/operation-directory/interfaces/schemas/resolveOutputSchema-input.yaml
+    output:
+      schema_ref: docs/operation-directory/interfaces/schemas/resolveOutputSchema-output.yaml
+  checkHttpStatus:
+    kind: function
+    signature: checkHttpStatus(component, operation, status)
+    input:
+      schema_ref: docs/operation-directory/interfaces/schemas/checkHttpStatus-input.yaml
+    output:
+      schema_ref: docs/operation-directory/interfaces/schemas/checkHttpStatus-output.yaml
+  checkCliExitCode:
+    kind: function
+    signature: checkCliExitCode(component, operation, exit_code)
+    input:
+      schema_ref: docs/operation-directory/interfaces/schemas/checkCliExitCode-input.yaml
+    output:
+      schema_ref: docs/operation-directory/interfaces/schemas/checkCliExitCode-output.yaml

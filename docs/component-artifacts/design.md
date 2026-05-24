@@ -6,6 +6,11 @@ Component Artifacts は、component side の正本成果物を読み取り、Com
 
 component side は、個別コンポーネントの責務、契約、受け入れケース、テスト証拠を扱う。system trace は必須入力にしない。
 
+## 1.1 Interface semantics
+
+公開 operation の意味論は [semantics.md](semantics.md) を正本とする。
+この design は、その意味論を component discovery、scope / test-map 読み取り、interface path の受け渡しとしてどう実現するかを定義する。
+
 ## 2. 正本ファイル
 
 ```text

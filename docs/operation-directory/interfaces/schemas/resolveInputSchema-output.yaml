@@ -1,0 +1,15 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: resolveInputSchema output
+type: object
+additionalProperties: false
+properties:
+  schema_ref:
+    type: string
+  schema:
+    type: object
+    additionalProperties: true
+  diagnostics:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

@@ -1,0 +1,14 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: aggregateComponentRegression input
+type: object
+additionalProperties: false
+properties:
+  component_artifacts:
+    type: object
+    additionalProperties: true
+  junit_result_set:
+    type: object
+    additionalProperties: true
+  policy:
+    type: object
+    additionalProperties: true

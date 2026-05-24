@@ -1,0 +1,17 @@
+component: component-harness
+
+operations:
+  validateComponentArtifacts:
+    kind: function
+    signature: validateComponentArtifacts(component_artifacts, operation_directory)
+    input:
+      schema_ref: docs/component-harness/interfaces/schemas/validateComponentArtifacts-input.yaml
+    output:
+      schema_ref: docs/component-harness/interfaces/schemas/validateComponentArtifacts-output.yaml
+  buildReviewContextSource:
+    kind: function
+    signature: buildReviewContextSource(component_artifacts, operation_directory)
+    input:
+      schema_ref: docs/component-harness/interfaces/schemas/buildReviewContextSource-input.yaml
+    output:
+      schema_ref: docs/component-harness/interfaces/schemas/buildReviewContextSource-output.yaml
