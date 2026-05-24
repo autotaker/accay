@@ -230,7 +230,7 @@ MVP では以下をサポートする。
 |---|---|---|
 | `openapi.yaml` | `kind: http` | OpenAPI の `operationId` を operation ID として読む |
 | `operations.yaml` | `kind: http` / `cli` / `function` | 非 HTTP も含む Accay native 形式 |
-| JSON Schema | `input` / `output` | trace value の検証に使う |
+| JSON Schema | 独自型 / trace `input` / `output` | operation 境界の独自型定義と trace value の検証に使う |
 
 ### 4.2 OpenAPI の扱い
 
@@ -263,8 +263,19 @@ MVP で機械的に読む必須項目は以下。
 
 - `component`
 - `operations.{operationId}.kind`
-- `operations.{operationId}.input.schema_ref`
-- `operations.{operationId}.output.schema_ref`
+- `operations.{operationId}.schema_refs`
+
+`schema_refs` は、operation の `signature` や CLI command 境界に現れる Accay 独自型名から JSON Schema への参照辞書である。
+`Path` / `str` / `int` / `bool` などの標準的な型には schema 参照を付けない。
+1つの schema file には `$defs` で複数の独自型をまとめてよい。
+
+例:
+
+```yaml
+signature: loadComponentArtifacts(components_root: Path, component: str) -> ComponentArtifactSet
+schema_refs:
+  ComponentArtifactSet: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/ComponentArtifactSet
+```
 
 kind 別の追加項目。
 
@@ -272,7 +283,7 @@ kind 別の追加項目。
 |---|---|---|
 | `http` | `method`, `path`, `status_codes` | `status_codes` は検証対象 |
 | `cli` | `command`, `exit_codes` | `exit_codes` は検証対象 |
-| `function` | `signature`, `errors` | 参照情報。実コード検証はしない |
+| `function` | `signature`, `schema_refs`, `errors` | `signature` は型付きで書く。実コード検証はしない |
 
 ### 4.4 operationId の一意性
 
@@ -925,10 +936,9 @@ operations:
     kind: http
     method: POST
     path: /orders
-    input:
-      schema_ref: docs/acceptance/components/order-api/interfaces/schemas/create-order-input.schema.json
-    output:
-      schema_ref: docs/acceptance/components/order-api/interfaces/schemas/create-order-output.schema.json
+    schema_refs:
+      CreateOrderInput: docs/acceptance/components/order-api/interfaces/schemas/order-api.yaml#/$defs/CreateOrderInput
+      CreateOrderOutput: docs/acceptance/components/order-api/interfaces/schemas/order-api.yaml#/$defs/CreateOrderOutput
     status_codes:
       success: [201]
       failure: [400, 409, 500]
@@ -944,10 +954,9 @@ operations:
     kind: cli
     command: user-import
     summary: Import users from a CSV file
-    input:
-      schema_ref: docs/acceptance/components/user-import-cli/interfaces/schemas/import-users-input.schema.json
-    output:
-      schema_ref: docs/acceptance/components/user-import-cli/interfaces/schemas/import-users-output.schema.json
+    schema_refs:
+      ImportUsersInput: docs/acceptance/components/user-import-cli/interfaces/schemas/user-import-cli.yaml#/$defs/ImportUsersInput
+      ImportUsersResult: docs/acceptance/components/user-import-cli/interfaces/schemas/user-import-cli.yaml#/$defs/ImportUsersResult
     exit_codes:
       success: [0]
       failure: [1]
@@ -961,12 +970,11 @@ component: order-domain
 operations:
   createOrder:
     kind: function
-    signature: OrderService.createOrder(command)
+    signature: createOrder(command: CreateOrderCommand) -> CreateOrderResult
     summary: Create an order through the order domain service
-    input:
-      schema_ref: docs/acceptance/components/order-domain/interfaces/schemas/create-order-command.schema.json
-    output:
-      schema_ref: docs/acceptance/components/order-domain/interfaces/schemas/create-order-result.schema.json
+    schema_refs:
+      CreateOrderCommand: docs/acceptance/components/order-domain/interfaces/schemas/order-domain.yaml#/$defs/CreateOrderCommand
+      CreateOrderResult: docs/acceptance/components/order-domain/interfaces/schemas/order-domain.yaml#/$defs/CreateOrderResult
     errors:
       - InventoryShortageError
       - PaymentAuthorizationError

@@ -1,45 +1,33 @@
 component: operation-directory
-
 operations:
   buildOperationDirectory:
     kind: function
-    signature: buildOperationDirectory(component_interfaces)
-    input:
-      schema_ref: docs/operation-directory/interfaces/schemas/buildOperationDirectory-input.yaml
-    output:
-      schema_ref: docs/operation-directory/interfaces/schemas/buildOperationDirectory-output.yaml
+    signature: 'buildOperationDirectory(component_interfaces: list[ComponentInterfaceSource]) -> OperationDirectory'
+    schema_refs:
+      ComponentInterfaceSource: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/ComponentInterfaceSource
+      OperationDirectory: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/OperationDirectory
   lookupOperation:
     kind: function
-    signature: lookupOperation(component, operation)
-    input:
-      schema_ref: docs/operation-directory/interfaces/schemas/lookupOperation-input.yaml
-    output:
-      schema_ref: docs/operation-directory/interfaces/schemas/lookupOperation-output.yaml
+    signature: 'lookupOperation(component: str, operation: str) -> OperationLookupResult'
+    schema_refs:
+      OperationLookupResult: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/OperationLookupResult
   resolveInputSchema:
     kind: function
-    signature: resolveInputSchema(component, operation)
-    input:
-      schema_ref: docs/operation-directory/interfaces/schemas/resolveInputSchema-input.yaml
-    output:
-      schema_ref: docs/operation-directory/interfaces/schemas/resolveInputSchema-output.yaml
+    signature: 'resolveInputSchema(component: str, operation: str) -> SchemaResolutionResult'
+    schema_refs:
+      SchemaResolutionResult: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/SchemaResolutionResult
   resolveOutputSchema:
     kind: function
-    signature: resolveOutputSchema(component, operation)
-    input:
-      schema_ref: docs/operation-directory/interfaces/schemas/resolveOutputSchema-input.yaml
-    output:
-      schema_ref: docs/operation-directory/interfaces/schemas/resolveOutputSchema-output.yaml
+    signature: 'resolveOutputSchema(component: str, operation: str) -> SchemaResolutionResult'
+    schema_refs:
+      SchemaResolutionResult: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/SchemaResolutionResult
   checkHttpStatus:
     kind: function
-    signature: checkHttpStatus(component, operation, status)
-    input:
-      schema_ref: docs/operation-directory/interfaces/schemas/checkHttpStatus-input.yaml
-    output:
-      schema_ref: docs/operation-directory/interfaces/schemas/checkHttpStatus-output.yaml
+    signature: 'checkHttpStatus(component: str, operation: str, status: int) -> StatusCheckResult'
+    schema_refs:
+      StatusCheckResult: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/StatusCheckResult
   checkCliExitCode:
     kind: function
-    signature: checkCliExitCode(component, operation, exit_code)
-    input:
-      schema_ref: docs/operation-directory/interfaces/schemas/checkCliExitCode-input.yaml
-    output:
-      schema_ref: docs/operation-directory/interfaces/schemas/checkCliExitCode-output.yaml
+    signature: 'checkCliExitCode(component: str, operation: str, exit_code: int) -> ExitCodeCheckResult'
+    schema_refs:
+      ExitCodeCheckResult: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/ExitCodeCheckResult

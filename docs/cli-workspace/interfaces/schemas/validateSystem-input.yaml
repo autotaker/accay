@@ -1,9 +1,0 @@
-$schema: https://json-schema.org/draft/2020-12/schema
-title: validateSystem input
-type: object
-additionalProperties: false
-properties:
-  root:
-    type: string
-  scenario:
-    type: string

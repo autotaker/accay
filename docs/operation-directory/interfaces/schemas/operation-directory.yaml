@@ -1,0 +1,84 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: docs/operation-directory/interfaces/schemas/operation-directory.yaml
+title: operation-directory interface schemas
+type: object
+additionalProperties: false
+$defs:
+  ComponentInterfaceSource:
+    type: object
+    additionalProperties: false
+    properties:
+      component:
+        type: string
+      interfaces_path:
+        type: string
+  OperationDirectory:
+    type: object
+    additionalProperties: false
+    properties:
+      catalog:
+        type: object
+        additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  OperationLookupResult:
+    type: object
+    additionalProperties: false
+    properties:
+      found:
+        type: boolean
+      operation_contract:
+        type: object
+        additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  SchemaResolutionResult:
+    type: object
+    additionalProperties: false
+    properties:
+      schema_ref:
+        type: string
+      schema:
+        type: object
+        additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  StatusCheckResult:
+    type: object
+    additionalProperties: false
+    properties:
+      allowed:
+        type: boolean
+      allowed_statuses:
+        type: array
+        items:
+          type: integer
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  ExitCodeCheckResult:
+    type: object
+    additionalProperties: false
+    properties:
+      allowed:
+        type: boolean
+      allowed_exit_codes:
+        type: array
+        items:
+          type: integer
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true

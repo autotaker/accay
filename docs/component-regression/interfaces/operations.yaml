@@ -1,31 +1,30 @@
 component: component-regression
-
 operations:
   readJUnitResultSet:
     kind: function
-    signature: readJUnitResultSet(junit_paths)
-    input:
-      schema_ref: docs/component-regression/interfaces/schemas/readJUnitResultSet-input.yaml
-    output:
-      schema_ref: docs/component-regression/interfaces/schemas/readJUnitResultSet-output.yaml
+    signature: 'readJUnitResultSet(junit_paths: list[Path]) -> JUnitResultSet'
+    schema_refs:
+      JUnitResultSet: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/JUnitResultSet
   matchTestMap:
     kind: function
-    signature: matchTestMap(test_map, junit_result_set)
-    input:
-      schema_ref: docs/component-regression/interfaces/schemas/matchTestMap-input.yaml
-    output:
-      schema_ref: docs/component-regression/interfaces/schemas/matchTestMap-output.yaml
+    signature: 'matchTestMap(test_map: TestMapArtifact, junit_result_set: JUnitResultSet) -> TestMapMatchResult'
+    schema_refs:
+      TestMapArtifact: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/TestMapArtifact
+      JUnitResultSet: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/JUnitResultSet
+      TestMapMatchResult: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/TestMapMatchResult
   aggregateComponentRegression:
     kind: function
-    signature: aggregateComponentRegression(component_artifacts, junit_result_set, policy)
-    input:
-      schema_ref: docs/component-regression/interfaces/schemas/aggregateComponentRegression-input.yaml
-    output:
-      schema_ref: docs/component-regression/interfaces/schemas/aggregateComponentRegression-output.yaml
+    signature: 'aggregateComponentRegression(component_artifacts: ComponentArtifactSet, junit_result_set: JUnitResultSet, policy: RegressionPolicy) -> ComponentRegressionResult'
+    schema_refs:
+      ComponentArtifactSet: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/ComponentArtifactSet
+      JUnitResultSet: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/JUnitResultSet
+      RegressionPolicy: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/RegressionPolicy
+      ComponentRegressionResult: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/ComponentRegressionResult
   aggregateAllComponentRegression:
     kind: function
-    signature: aggregateAllComponentRegression(component_artifacts, junit_result_set, policy)
-    input:
-      schema_ref: docs/component-regression/interfaces/schemas/aggregateAllComponentRegression-input.yaml
-    output:
-      schema_ref: docs/component-regression/interfaces/schemas/aggregateAllComponentRegression-output.yaml
+    signature: 'aggregateAllComponentRegression(component_artifacts: list[ComponentArtifactSet], junit_result_set: JUnitResultSet, policy: RegressionPolicy) -> RepositoryRegressionResult'
+    schema_refs:
+      ComponentArtifactSet: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/ComponentArtifactSet
+      JUnitResultSet: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/JUnitResultSet
+      RegressionPolicy: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/RegressionPolicy
+      RepositoryRegressionResult: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/RepositoryRegressionResult

@@ -1,0 +1,62 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: docs/output-presentation/interfaces/schemas/output-presentation.yaml
+title: output-presentation interface schemas
+type: object
+additionalProperties: false
+$defs:
+  Diagnostic:
+    type: object
+    additionalProperties: false
+    properties:
+      severity:
+        type: string
+      message:
+        type: string
+      source_path:
+        type: string
+  DiagnosticsSummary:
+    type: object
+    additionalProperties: false
+    properties:
+      text:
+        type: string
+      severity_counts:
+        type: object
+        additionalProperties: true
+      exit_code:
+        type: integer
+  ContextWriteResult:
+    type: object
+    additionalProperties: false
+    properties:
+      context_path:
+        type: string
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  RegressionReportWriteResult:
+    type: object
+    additionalProperties: false
+    properties:
+      markdown_path:
+        type: string
+      html_path:
+        type: string
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  ReportServerResult:
+    type: object
+    additionalProperties: false
+    properties:
+      url:
+        type: string
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true

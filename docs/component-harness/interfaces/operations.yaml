@@ -1,17 +1,17 @@
 component: component-harness
-
 operations:
   validateComponentArtifacts:
     kind: function
-    signature: validateComponentArtifacts(component_artifacts, operation_directory)
-    input:
-      schema_ref: docs/component-harness/interfaces/schemas/validateComponentArtifacts-input.yaml
-    output:
-      schema_ref: docs/component-harness/interfaces/schemas/validateComponentArtifacts-output.yaml
+    signature: 'validateComponentArtifacts(component_artifacts: ComponentArtifactSet, operation_directory: OperationDirectory) -> ComponentValidationResult'
+    schema_refs:
+      OperationDirectory: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/OperationDirectory
+      ComponentArtifactSet: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/ComponentArtifactSet
+      ComponentValidationResult: docs/component-harness/interfaces/schemas/component-harness.yaml#/$defs/ComponentValidationResult
   buildReviewContextSource:
     kind: function
-    signature: buildReviewContextSource(component_artifacts, operation_directory)
-    input:
-      schema_ref: docs/component-harness/interfaces/schemas/buildReviewContextSource-input.yaml
-    output:
-      schema_ref: docs/component-harness/interfaces/schemas/buildReviewContextSource-output.yaml
+    signature: 'buildReviewContextSource(component_artifacts: ComponentArtifactSet, operation_directory: OperationDirectory, case_id: str, junit_summary: JUnitSummary | None) -> ReviewContextSource'
+    schema_refs:
+      OperationDirectory: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/OperationDirectory
+      ComponentArtifactSet: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/ComponentArtifactSet
+      JUnitSummary: docs/component-harness/interfaces/schemas/component-harness.yaml#/$defs/JUnitSummary
+      ReviewContextSource: docs/component-harness/interfaces/schemas/component-harness.yaml#/$defs/ReviewContextSource

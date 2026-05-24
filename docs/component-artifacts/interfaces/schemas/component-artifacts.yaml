@@ -1,0 +1,69 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml
+title: component-artifacts interface schemas
+type: object
+additionalProperties: false
+$defs:
+  ComponentInventory:
+    type: object
+    additionalProperties: false
+    properties:
+      components:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  ComponentArtifactSet:
+    type: object
+    additionalProperties: false
+    properties:
+      component:
+        type: string
+      scope:
+        type: object
+        additionalProperties: true
+      test_map:
+        type: object
+        additionalProperties: true
+      semantics_path:
+        type: string
+      interfaces_path:
+        type: string
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  AcceptanceScopeArtifact:
+    type: object
+    additionalProperties: false
+    properties:
+      component:
+        type: string
+      cases:
+        type: object
+        additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  TestMapArtifact:
+    type: object
+    additionalProperties: false
+    properties:
+      component:
+        type: string
+      mappings:
+        type: object
+        additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true

@@ -41,8 +41,8 @@ operation catalog は、component ごとに operation を保持する。
 | component | component 名 |
 | operation id | component 内で一意な operation ID |
 | kind | `http`, `cli`, `function` |
-| input schema ref | input value の schema |
-| output schema ref | output value の schema |
+| signature | `function` の型付き境界。実コード存在確認はしない |
+| schema refs | Accay 独自型名から JSON Schema `$defs` への参照 |
 | status codes | `http` の場合の許容 status |
 | exit codes | `cli` の場合の許容 exit code |
 
@@ -51,6 +51,7 @@ MVP では namespace や override は持たない。同一 component 内で Open
 ## 4. Schema registry
 
 Schema registry は、repository root からの相対 path で JSON Schema を解決する。
+`operations.yaml` では `schema_refs` を使い、独自型名から `schemas/{component}.yaml#/$defs/{TypeName}` のような JSON Pointer 付き参照へ解決する。
 
 用途:
 

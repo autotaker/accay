@@ -1,38 +1,31 @@
 component: output-presentation
-
 operations:
   renderDiagnosticsSummary:
     kind: function
-    signature: renderDiagnosticsSummary(diagnostics)
-    input:
-      schema_ref: docs/output-presentation/interfaces/schemas/renderDiagnosticsSummary-input.yaml
-    output:
-      schema_ref: docs/output-presentation/interfaces/schemas/renderDiagnosticsSummary-output.yaml
+    signature: 'renderDiagnosticsSummary(diagnostics: list[Diagnostic], format: str) -> DiagnosticsSummary'
+    schema_refs:
+      Diagnostic: docs/output-presentation/interfaces/schemas/output-presentation.yaml#/$defs/Diagnostic
+      DiagnosticsSummary: docs/output-presentation/interfaces/schemas/output-presentation.yaml#/$defs/DiagnosticsSummary
   writeDeskDebugContext:
     kind: function
-    signature: writeDeskDebugContext(context_source, run)
-    input:
-      schema_ref: docs/output-presentation/interfaces/schemas/writeDeskDebugContext-input.yaml
-    output:
-      schema_ref: docs/output-presentation/interfaces/schemas/writeDeskDebugContext-output.yaml
+    signature: 'writeDeskDebugContext(context_source: DeskDebugContextSource, run_id: str, runs_dir: Path) -> ContextWriteResult'
+    schema_refs:
+      DeskDebugContextSource: docs/system-harness/interfaces/schemas/system-harness.yaml#/$defs/DeskDebugContextSource
+      ContextWriteResult: docs/output-presentation/interfaces/schemas/output-presentation.yaml#/$defs/ContextWriteResult
   writeReviewContext:
     kind: function
-    signature: writeReviewContext(context_source, run)
-    input:
-      schema_ref: docs/output-presentation/interfaces/schemas/writeReviewContext-input.yaml
-    output:
-      schema_ref: docs/output-presentation/interfaces/schemas/writeReviewContext-output.yaml
+    signature: 'writeReviewContext(context_source: ReviewContextSource, run_id: str, runs_dir: Path) -> ContextWriteResult'
+    schema_refs:
+      ReviewContextSource: docs/component-harness/interfaces/schemas/component-harness.yaml#/$defs/ReviewContextSource
+      ContextWriteResult: docs/output-presentation/interfaces/schemas/output-presentation.yaml#/$defs/ContextWriteResult
   writeRegressionReports:
     kind: function
-    signature: writeRegressionReports(regression_result, report_dirs)
-    input:
-      schema_ref: docs/output-presentation/interfaces/schemas/writeRegressionReports-input.yaml
-    output:
-      schema_ref: docs/output-presentation/interfaces/schemas/writeRegressionReports-output.yaml
+    signature: 'writeRegressionReports(regression_result: RepositoryRegressionResult, markdown_dir: Path, html_dir: Path) -> RegressionReportWriteResult'
+    schema_refs:
+      RepositoryRegressionResult: docs/component-regression/interfaces/schemas/component-regression.yaml#/$defs/RepositoryRegressionResult
+      RegressionReportWriteResult: docs/output-presentation/interfaces/schemas/output-presentation.yaml#/$defs/RegressionReportWriteResult
   serveGeneratedReports:
     kind: function
-    signature: serveGeneratedReports(report_dir, bind)
-    input:
-      schema_ref: docs/output-presentation/interfaces/schemas/serveGeneratedReports-input.yaml
-    output:
-      schema_ref: docs/output-presentation/interfaces/schemas/serveGeneratedReports-output.yaml
+    signature: 'serveGeneratedReports(report_dir: Path, host: str, port: int) -> ReportServerResult'
+    schema_refs:
+      ReportServerResult: docs/output-presentation/interfaces/schemas/output-presentation.yaml#/$defs/ReportServerResult

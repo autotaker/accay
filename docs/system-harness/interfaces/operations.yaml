@@ -1,17 +1,16 @@
 component: system-harness
-
 operations:
   validateSystemArtifacts:
     kind: function
-    signature: validateSystemArtifacts(system_artifacts, operation_directory)
-    input:
-      schema_ref: docs/system-harness/interfaces/schemas/validateSystemArtifacts-input.yaml
-    output:
-      schema_ref: docs/system-harness/interfaces/schemas/validateSystemArtifacts-output.yaml
+    signature: 'validateSystemArtifacts(system_artifacts: ScenarioArtifactSet, operation_directory: OperationDirectory) -> SystemValidationResult'
+    schema_refs:
+      ScenarioArtifactSet: docs/system-artifacts/interfaces/schemas/system-artifacts.yaml#/$defs/ScenarioArtifactSet
+      OperationDirectory: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/OperationDirectory
+      SystemValidationResult: docs/system-harness/interfaces/schemas/system-harness.yaml#/$defs/SystemValidationResult
   buildDeskDebugContextSource:
     kind: function
-    signature: buildDeskDebugContextSource(system_artifacts, operation_directory)
-    input:
-      schema_ref: docs/system-harness/interfaces/schemas/buildDeskDebugContextSource-input.yaml
-    output:
-      schema_ref: docs/system-harness/interfaces/schemas/buildDeskDebugContextSource-output.yaml
+    signature: 'buildDeskDebugContextSource(scenario: str, system_artifacts: ScenarioArtifactSet, operation_directory: OperationDirectory) -> DeskDebugContextSource'
+    schema_refs:
+      ScenarioArtifactSet: docs/system-artifacts/interfaces/schemas/system-artifacts.yaml#/$defs/ScenarioArtifactSet
+      OperationDirectory: docs/operation-directory/interfaces/schemas/operation-directory.yaml#/$defs/OperationDirectory
+      DeskDebugContextSource: docs/system-harness/interfaces/schemas/system-harness.yaml#/$defs/DeskDebugContextSource

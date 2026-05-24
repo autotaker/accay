@@ -1,0 +1,89 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: docs/component-regression/interfaces/schemas/component-regression.yaml
+title: component-regression interface schemas
+type: object
+additionalProperties: false
+$defs:
+  JUnitResultSet:
+    type: object
+    additionalProperties: false
+    properties:
+      testcases:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  TestMapMatchResult:
+    type: object
+    additionalProperties: false
+    properties:
+      matched_tests:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      missing_tests:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      unmapped_tests:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  RegressionPolicy:
+    type: object
+    additionalProperties: false
+    properties:
+      accepted_failed:
+        type: string
+      accepted_error:
+        type: string
+      accepted_missing:
+        type: string
+      accepted_skipped:
+        type: string
+      non_accepted_failed:
+        type: string
+      unmapped:
+        type: string
+  ComponentRegressionResult:
+    type: object
+    additionalProperties: false
+    properties:
+      component:
+        type: string
+      overall_status:
+        type: string
+      case_results:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  RepositoryRegressionResult:
+    type: object
+    additionalProperties: false
+    properties:
+      overall_status:
+        type: string
+      component_results:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true

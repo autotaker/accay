@@ -1,0 +1,33 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: docs/system-harness/interfaces/schemas/system-harness.yaml
+title: system-harness interface schemas
+type: object
+additionalProperties: false
+$defs:
+  SystemValidationResult:
+    type: object
+    additionalProperties: false
+    properties:
+      status:
+        type: string
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  DeskDebugContextSource:
+    type: object
+    additionalProperties: false
+    properties:
+      scenario:
+        type: string
+      sections:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true

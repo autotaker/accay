@@ -1,31 +1,22 @@
 component: component-artifacts
-
 operations:
   discoverComponents:
     kind: function
-    signature: discoverComponents(workspace)
-    input:
-      schema_ref: docs/component-artifacts/interfaces/schemas/discoverComponents-input.yaml
-    output:
-      schema_ref: docs/component-artifacts/interfaces/schemas/discoverComponents-output.yaml
+    signature: 'discoverComponents(components_root: Path) -> ComponentInventory'
+    schema_refs:
+      ComponentInventory: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/ComponentInventory
   loadComponentArtifacts:
     kind: function
-    signature: loadComponentArtifacts(workspace, component)
-    input:
-      schema_ref: docs/component-artifacts/interfaces/schemas/loadComponentArtifacts-input.yaml
-    output:
-      schema_ref: docs/component-artifacts/interfaces/schemas/loadComponentArtifacts-output.yaml
+    signature: 'loadComponentArtifacts(components_root: Path, component: str) -> ComponentArtifactSet'
+    schema_refs:
+      ComponentArtifactSet: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/ComponentArtifactSet
   loadAcceptanceScope:
     kind: function
-    signature: loadAcceptanceScope(component_path)
-    input:
-      schema_ref: docs/component-artifacts/interfaces/schemas/loadAcceptanceScope-input.yaml
-    output:
-      schema_ref: docs/component-artifacts/interfaces/schemas/loadAcceptanceScope-output.yaml
+    signature: 'loadAcceptanceScope(component_path: Path) -> AcceptanceScopeArtifact'
+    schema_refs:
+      AcceptanceScopeArtifact: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/AcceptanceScopeArtifact
   loadTestMap:
     kind: function
-    signature: loadTestMap(component_path)
-    input:
-      schema_ref: docs/component-artifacts/interfaces/schemas/loadTestMap-input.yaml
-    output:
-      schema_ref: docs/component-artifacts/interfaces/schemas/loadTestMap-output.yaml
+    signature: 'loadTestMap(component_path: Path) -> TestMapArtifact'
+    schema_refs:
+      TestMapArtifact: docs/component-artifacts/interfaces/schemas/component-artifacts.yaml#/$defs/TestMapArtifact

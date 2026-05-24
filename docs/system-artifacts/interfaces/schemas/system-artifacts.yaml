@@ -1,0 +1,58 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: docs/system-artifacts/interfaces/schemas/system-artifacts.yaml
+title: system-artifacts interface schemas
+type: object
+additionalProperties: false
+$defs:
+  SystemArtifactInventory:
+    type: object
+    additionalProperties: false
+    properties:
+      scenarios:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  ScenarioArtifactSet:
+    type: object
+    additionalProperties: false
+    properties:
+      scenario_id:
+        type: string
+      scenario_path:
+        type: string
+      sequence_path:
+        type: string
+      trace_path:
+        type: string
+      trace_steps:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  TraceArtifact:
+    type: object
+    additionalProperties: false
+    properties:
+      scenario:
+        type: string
+      steps:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true

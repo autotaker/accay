@@ -1,0 +1,49 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: docs/component-harness/interfaces/schemas/component-harness.yaml
+title: component-harness interface schemas
+type: object
+additionalProperties: false
+$defs:
+  ComponentValidationResult:
+    type: object
+    additionalProperties: false
+    properties:
+      status:
+        type: string
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  JUnitSummary:
+    type: object
+    additionalProperties: false
+    properties:
+      testcases:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+  ReviewContextSource:
+    type: object
+    additionalProperties: false
+    properties:
+      component:
+        type: string
+      case_id:
+        type: string
+      sections:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+      diagnostics:
+        type: array
+        items:
+          type: object
+          additionalProperties: true

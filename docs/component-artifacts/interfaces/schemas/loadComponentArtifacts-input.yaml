@@ -1,9 +1,0 @@
-$schema: https://json-schema.org/draft/2020-12/schema
-title: loadComponentArtifacts input
-type: object
-additionalProperties: false
-properties:
-  components_root:
-    type: string
-  component:
-    type: string
