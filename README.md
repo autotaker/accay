@@ -52,10 +52,39 @@ accay component regression <component> --junit <path>
 ## Development
 
 ```bash
-python -m venv .venv
-. .venv/bin/activate
-pip install -e ".[dev]"
-python -m unittest
+uv sync --extra dev
+```
+
+Run the test suite:
+
+```bash
+uv run pytest
+```
+
+Check lint rules:
+
+```bash
+uv run ruff check
+```
+
+Format Python files:
+
+```bash
+uv run ruff format
+```
+
+Run static type checking:
+
+```bash
+uv run pyright src/accay
+```
+
+Before sending a change for review, run:
+
+```bash
+uv run pytest
+uv run ruff check
+uv run pyright src/accay
 ```
 
 ## License

@@ -8,7 +8,7 @@ Accay の Python code は、CLI ツールとしての読みやすさ、テスト
 
 ## 2. Language baseline
 
-- Python 3.11 以上を前提にする。
+- Python 3.12 以上を前提にする。
 - type hint を付ける。
 - `pathlib.Path` を使う。
 - YAML / JSON / XML は専用 parser を使う。

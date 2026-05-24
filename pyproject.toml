@@ -7,7 +7,7 @@ name = "accay"
 version = "0.1.0"
 description = "Acceptance-driven development support tool for AI-assisted coding workflows."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [
   { name = "Accay contributors" }
@@ -19,18 +19,21 @@ classifiers = [
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
 ]
 dependencies = [
   "jsonschema>=4.22",
+  "Jinja2>=3.1",
   "PyYAML>=6.0",
+  "rich>=13",
 ]
 
 [project.optional-dependencies]
 dev = [
+  "pyright>=1.1",
+  "pytest>=8",
   "ruff>=0.4",
 ]
 
@@ -45,4 +48,11 @@ accay = ["templates/skills/*/SKILL.md"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py312"
+
+[tool.uv]
+# Keep newly uploaded distributions out of dependency resolution for the first
+# week to reduce exposure to compromised or accidentally broken releases.
+exclude-newer = "7 days"
+index-strategy = "first-index"
+prerelease = "disallow"
