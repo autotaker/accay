@@ -1,490 +1,629 @@
 # Accay 基本設計
 
-作成日: 2026-05-24
-対象: Accay MVP
+作成日: 2026-05-24  
+対象: Accay MVP  
 参照: [requirements.md](requirements.md)
 
-## 1. 設計目的
+## 1. この文書の位置づけ
 
 この文書は、Accay MVP の実装を進めるための基本設計である。
 
-Accay は、AI コーディングエージェントが生成した変更を、テスト結果だけではなく、意味・証拠・責務境界に基づいて受け入れ可能か確認するためのツールである。MVP のハーネスは最終判断を行わず、判断に必要な入力、構造、照合結果、レポートを安定して揃える。
+この文書で固定するのは、実装前に揺らしたくない境界である。
+
+- コンポーネント分割
+- コンポーネントごとの責務
+- コンポーネント間の依存方向
+- パッケージ構成の目安
+- 代表的な処理シーケンス
+- Accay 自身のテスト構成の最小方針
+
+一方で、実装中に調整してよい詳細はここでは固定しない。
+
+- 内部データモデル
+- クラス設計
+- 関数シグネチャ
+- parser / validator の細かい実装方式
+- report / context の詳細テンプレート
+- dashboard の具体 UI
+- 詳細なテストケース一覧
+- fixture project の個別内容
+- golden file 比較や pytest marker の詳細ルール
+
+Accay のハーネスは、最終的な受け入れ判断を行わない。ハーネスの役割は、エージェントと人間が判断できるように、入力、構造、照合結果、レポートを安定して揃えることである。
 
 ## 2. 設計方針
 
 | 方針 | 内容 |
 |---|---|
-| 判断と機械処理を分離する | ハーネスは形式検証、schema validation、JUnit 照合、レポート生成に徹する。意味判断と最終受け入れ判断は人間とエージェントに残す。 |
-| operation を中心に扱う | endpoint や関数名ではなく、`component + operation` を内部モデルの基本単位にする。 |
-| 長期保守成果物を優先する | 人間が読む仕様、trace、scope、test-map は `docs/acceptance/` 以下を正本にする。 |
-| 一時成果物を隔離する | context pack、review decision、生成レポートは `.accay/` 以下に置き、長期保守成果物と混ぜない。 |
-| adapter 境界を明確にする | OpenAPI や JUnit XML など外部形式は、内部モデルへ変換してから後続処理に渡す。 |
-| MVP では静的に扱う | PR 投稿、自動修正、test-map 自動更新、言語別静的解析は行わない。 |
+| system と component を分ける | system は業務シナリオと operation 列を扱う。component は責務、契約、受け入れケース、テスト証拠を扱う。 |
+| 接続点を Operation Directory に寄せる | system と component は互いの成果物を直接の正本として読まない。`component + operation` の契約参照を境界にする。 |
+| 判断と機械処理を分ける | ハーネスは形式検証、schema validation、JUnit 照合、report / context 生成を行う。意味判断と最終判断は人間とエージェントに残す。 |
+| 長期保守成果物と一時成果物を分ける | `docs/acceptance/` は人間も読む正本、`.accay/` は設定・生成物・一時成果物とする。 |
+| 外部形式を境界で扱う | OpenAPI、operations.yaml、JSON Schema、JUnit XML は、それぞれ専用の読み取り箇所を持つ。 |
+| MVP では静的に扱う | PR 投稿、自動修正、test-map 自動更新、言語別静的解析、エージェント実行は行わない。 |
 
 ## 3. 全体構成
 
+Accay MVP は、以下の 8 コンポーネントで構成する。
+
+大きく見ると、構成は4つの領域に分かれる。
+
+- `shared`: CLI、workspace、表示など、system / component の両方から使う領域
+- `system`: システム全体の業務シナリオと trace を扱う領域
+- `boundary`: system と component の唯一の機械的な接続点
+- `component`: 個別コンポーネントの責務、契約、受け入れケース、証拠を扱う領域
+
 ```mermaid
 flowchart TD
-  User["Human / CI / Agent"] --> CLI["CLI Adapter"]
-  CLI --> Config["Project Config"]
-  CLI --> Project["Project Initializer"]
-  CLI --> Installer["Skill Installer"]
-  CLI --> ArtifactRepo["Acceptance Artifact Repository"]
-  CLI --> Validator["Validation Orchestrator"]
-  CLI --> Pack["Context Pack Builder"]
-  CLI --> Regression["Regression Engine"]
-  CLI --> Server["Dashboard Server"]
+  User["Human / CI / Agent"] --> CLI["CLI & Workspace"]
 
-  Config --> ArtifactRepo
-  Project --> Files["Repository Files"]
-  Installer --> Skills[".agents/skills/accay-*"]
+  subgraph SystemSide["System side"]
+    SystemArtifacts["System Artifacts"]
+    SystemHarness["System Harness"]
+  end
 
-  ArtifactRepo --> Scenario["Scenario Reader"]
-  ArtifactRepo --> Trace["Trace Reader"]
-  ArtifactRepo --> Component["Component Artifact Reader"]
-  ArtifactRepo --> Interfaces["Interface Catalog"]
+  subgraph Boundary["Boundary"]
+    OperationDirectory["Operation Directory"]
+  end
 
-  Interfaces --> OpenAPI["OpenAPI Adapter"]
-  Interfaces --> Operations["operations.yaml Adapter"]
-  Interfaces --> Schemas["JSON Schema Loader"]
+  subgraph ComponentSide["Component side"]
+    ComponentArtifacts["Component Artifacts"]
+    ComponentHarness["Component Harness"]
+    Regression["Component Regression"]
+  end
 
-  Validator --> SystemValidation["System Validator"]
-  Validator --> ComponentValidation["Component Validator"]
-  Validator --> TraceValidation["Trace Validator"]
-  TraceValidation --> Schemas
-  TraceValidation --> Interfaces
+  subgraph Presentation["Presentation"]
+    Output["Output & Presentation"]
+  end
 
-  Regression --> JUnit["JUnit Result Reader"]
-  Regression --> TestMap["test-map Matcher"]
-  Regression --> Reports["Report Renderer"]
-  Server --> Reports
-  Pack --> Runs[".accay/runs/{run-id}/context.md"]
-  Reports --> Output[".accay/reports/html and markdown"]
+  CLI --> SystemArtifacts
+  CLI --> SystemHarness
+  CLI --> OperationDirectory
+  CLI --> ComponentArtifacts
+  CLI --> ComponentHarness
+  CLI --> Regression
+  CLI --> Output
+
+  SystemArtifacts --> SystemHarness
+  SystemHarness --> OperationDirectory
+
+  ComponentArtifacts --> OperationDirectory
+  ComponentArtifacts --> ComponentHarness
+  ComponentArtifacts --> Regression
+  ComponentHarness --> OperationDirectory
+
+  SystemHarness --> Output
+  ComponentHarness --> Output
+  Regression --> Output
 ```
 
-## 4. 内部コンポーネント責務
+この図は論理構成を示す。実装上、同じ Python module 内で補助関数を共有してもよい。ただし、system と component の直接依存を作らないことを優先する。
 
-| コンポーネント | 主な責務 | 読むもの | 書くもの |
+接続の要点は次の通りである。
+
+- system 側は component の `acceptance-scope.yaml` や `test-map.yaml` を直接読まない。
+- component 側は system trace を正本として要求しない。
+- 両者の接点は `Operation Directory` が提供する `component + operation` の契約情報に限定する。
+
+## 4. コンポーネント責務
+
+### 4.1 責務一覧
+
+各コンポーネントの責務と非責務は以下の通りである。非責務を明示することで、実装時に境界がにじまないようにする。
+
+| コンポーネント | 領域 | 主な責務 | 主な非責務 |
 |---|---|---|---|
-| CLI Adapter | コマンドライン引数を解釈し、ユースケースに処理を委譲する。終了コードと標準出力の方針を統一する。 | CLI args | stdout / stderr / exit code |
-| Project Config | `.accay/config.yaml` を読み、docs root、skills install dir、JUnit path、regression rule、report dir、language 設定を提供する。 | `.accay/config.yaml` | なし |
-| Project Initializer | `accay init` で標準ディレクトリと初期 config を作る。既存ファイルは上書きしない。 | repository root | `.accay/config.yaml`, `docs/acceptance/`, `.accay/`, `.agents/skills/` |
-| Skill Installer | bundled skill template を設定された skill directory に配置する。既存 skill は上書きしない。 | package templates, config | `.agents/skills/accay-*` |
-| Acceptance Artifact Repository | `docs/acceptance/` 以下の成果物を発見し、後続処理が扱いやすい単位で返す。 | scenarios, sequences, traces, components | なし |
-| Interface Catalog | component ごとの operation catalog を作る。OpenAPI と `operations.yaml` を統合し、重複 operation ID を検出する。 | `openapi.yaml`, `operations.yaml` | in-memory operation catalog |
-| OpenAPI Adapter | OpenAPI から `operationId`、schema 参照、HTTP status code を読み、HTTP operation として正規化する。 | `openapi.yaml` | in-memory operations |
-| operations.yaml Adapter | Accay native operation 定義を読み、`http` / `cli` / `function` operation として正規化する。 | `operations.yaml` | in-memory operations |
-| JSON Schema Loader | schema file を読み込み、trace `input.value` / `output.value` の validation に使う。 | `*.schema.json` | compiled schema cache |
-| System Validator | scenario、sequence、trace、component、operation、schema の参照整合性を検証する。 | system artifacts | diagnostics |
-| Component Validator | `acceptance-scope.yaml` と `test-map.yaml` の構文、case 参照、`verifies` の必須性を検証する。 | component artifacts | diagnostics |
-| Trace Validator | trace step の重複、operation 参照、schema validation、HTTP status、CLI exit code、observation の最低限チェックを行う。 | trace, operation catalog, schemas | diagnostics |
-| JUnit Result Reader | 1つ以上の JUnit XML を読み、`classname + name` をキーにした test result set へ変換する。重複 testcase は error にする。 | JUnit XML | in-memory test result set |
-| Regression Engine | `test-map.yaml` と JUnit result set を照合し、case 単位の pass / fail / error / skipped / missing を集計する。 | acceptance scope, test-map, JUnit result set | regression result |
-| Context Pack Builder | エージェントに渡す Markdown context を生成する。system desk-debug と component review の2系統を扱う。 | related artifacts, diff, tests | `.accay/runs/{run-id}/context.md` |
-| Report Renderer | regression result や review result を Markdown / HTML に整形する。 | result models | `.accay/reports/markdown`, `.accay/reports/html` |
-| Dashboard Server | `accay serve` で HTML report を表示する。MVP では生成済み report を読む薄い viewer とする。 | report files, summary model | local HTTP response |
-| Diagnostics | error / warning / info を収集し、CLI exit code と report 表示に渡す共通モデルを提供する。 | component outputs | diagnostics summary |
+| CLI & Workspace | shared | コマンドライン引数の解釈、repository root の特定、`.accay/config.yaml` の読み取り、各処理の起動、`init` / `install` の実行 | 各成果物の深い検証、JUnit 照合、意味判断 |
+| System Artifacts | system | `scenario.feature`、`sequence.md`、`trace.yaml` の発見・読み取り・基本的な構造化 | component の `acceptance-scope.yaml` / `test-map.yaml` の読み取り |
+| System Harness | system | system validation、desk-debug context pack 生成、trace からの operation / schema 参照確認 | component の受け入れケース判定、JUnit 照合、最終的な意味判断 |
+| Operation Directory | boundary | component interfaces から operation contract と schema 参照を引けるようにする | `semantics.md` の意味判断、acceptance case の状態管理、test-map 照合 |
+| Component Artifacts | component | `acceptance-scope.yaml`、`test-map.yaml`、`semantics.md`、`interfaces/*` の発見・読み取り | system trace を正本として読むこと、JUnit XML の集計 |
+| Component Harness | component | component validation、acceptance review context pack 生成、scope / test-map / interfaces の整合性確認 | regression 判定、最終 accept / reject 判断、test-map の自動更新 |
+| Component Regression | component | JUnit XML と `test-map.yaml` の照合、case 単位の回帰結果集計 | 失敗原因の意味解釈、修正案作成、system trace の読み取り |
+| Output & Presentation | shared | diagnostics、context、regression result を Markdown / HTML / dashboard に整形する | 正本成果物の更新、validation / regression の実ロジック |
 
-## 5. データモデル
+### 4.2 責務境界の考え方
 
-MVP の内部モデルは、外部 YAML / JSON / XML をそのまま広げず、以下の概念に正規化して扱う。
+#### System side
+
+System side は、E2E に近い業務シナリオの流れを扱う領域である。主語は「システム全体のシナリオ」であり、個別コンポーネントの受け入れ判断ではない。
+
+正本として読む成果物は主に以下である。
+
+```text
+docs/acceptance/scenarios/
+docs/acceptance/sequences/
+docs/acceptance/traces/
+```
+
+System side が component 側に対して知ってよいのは、`component + operation` で参照できる契約情報だけである。これにより、trace は operation 列を検証できるが、component の受け入れ台帳には依存しない。
+
+System side は、以下をしない。
+
+- component の acceptance case ID を必須参照にする
+- `test-map.yaml` を読む
+- JUnit XML を読む
+- component regression の結果を正本として扱う
+
+#### Component side
+
+Component side は、個別コンポーネントの責務、契約、受け入れケース、テスト証拠を扱う領域である。主語は「その component を受け入れてよいか」であり、システム全体のシナリオ実行ではない。
+
+正本として読む成果物は主に以下である。
+
+```text
+docs/acceptance/components/{component}/
+  acceptance-scope.yaml
+  test-map.yaml
+  semantics.md
+  review-guidelines.md
+  interfaces/
+```
+
+Component side は、system trace を必須入力にしない。component validation と component regression は、component 配下の成果物だけで最低限回る必要がある。
+
+ただし、`component pack review` では、レビュー文脈を豊かにするために関連 trace / scenario / sequence を参考情報として含めてもよい。この場合も、component validation / component regression の正本にはしない。
+
+#### Boundary
+
+Operation Directory は、system と component の機械的な接続点である。ここに集約するのは、意味判断ではなく、operation contract の参照である。
+
+主な役割は以下である。
+
+- `component + operation` の存在確認
+- operation kind の参照
+- input / output schema 参照の解決
+- HTTP status code の参照
+- CLI exit code の参照
+- OpenAPI / operations.yaml の operation ID 重複検出
+
+Operation Directory は、意味論の正本ではない。意味論の正本は `semantics.md` である。
+
+#### Output
+
+Output & Presentation は、表示とファイル出力だけを扱う。各領域の結果を読みやすく整形するが、validation や regression の判断ロジックは持たない。
+
+- Markdown report
+- HTML report
+- context pack
+- local dashboard
+
+Output は system / component の結果を並べて表示してよい。ただし、表示の都合で system と component の正本を混ぜない。
+
+## 5. 依存関係
+
+### 5.1 許可する依存方向
+
+依存方向は、CLI から各領域へ流し、system / component は Operation Directory と Output だけを共有する形にする。
 
 ```mermaid
-classDiagram
-  class ProjectConfig {
-    docs_root
-    skills_install_dir
-    junit_paths
-    regression_rules
-    report_dirs
-    language
-  }
+flowchart LR
+  CLI["CLI & Workspace"] --> Workspace["workspace helpers"]
+  CLI --> System["system"]
+  CLI --> Operations["operations"]
+  CLI --> Component["component"]
+  CLI --> Output["output"]
 
-  class Scenario {
-    id
-    path
-  }
+  System --> Operations
+  System --> Output
 
-  class Trace {
-    scenario_id
-    steps
-  }
+  Component --> Operations
+  Component --> Output
 
-  class TraceStep {
-    id
-    component
-    operation
-    input_schema_ref
-    output_schema_ref
-    input_value
-    output_value
-    observations
-  }
-
-  class Component {
-    name
-    path
-  }
-
-  class Operation {
-    component
-    id
-    kind
-    input_schema_ref
-    output_schema_ref
-    status_codes
-    exit_codes
-  }
-
-  class AcceptanceCase {
-    id
-    title
-    priority
-    status
-    scenarios
-    operations
-  }
-
-  class TestMapping {
-    case_id
-    junit_classname
-    junit_name
-    verifies
-  }
-
-  class TestResult {
-    classname
-    name
-    status
-    message
-  }
-
-  class RegressionCaseResult {
-    case_id
-    status
-    test_results
-  }
-
-  Trace "1" --> "*" TraceStep
-  Component "1" --> "*" Operation
-  Component "1" --> "*" AcceptanceCase
-  AcceptanceCase "1" --> "*" TestMapping
-  TestMapping "*" --> "0..1" TestResult
-  RegressionCaseResult "*" --> "*" TestResult
+  Output -. "render only" .-> Reports["generated inputs"]
 ```
+
+基本の依存方向は以下とする。
+
+```text
+cli -> workspace
+cli -> system
+cli -> operations
+cli -> component
+cli -> output
+
+system -> operations
+system -> output
+
+component -> operations
+component -> output
+```
+
+### 5.2 禁止する依存方向
+
+以下の直接依存は持たない。特に、system と component が互いの artifact loader を呼び合わないようにする。
+
+```text
+system -> component
+component -> system
+operations -> system
+operations -> component
+output -> system artifact loaders
+output -> component artifact loaders
+```
+
+特に、次の2つは守る。
+
+- system validation は component の acceptance-scope / test-map に依存しない
+- component regression は system trace に依存しない
+
+### 5.3 CLI の位置づけ
+
+CLI は orchestration layer とする。CLI は処理の順序を決めるが、検証や照合の本体は持たない。
+
+CLI は複数コンポーネントを順に呼んでよい。たとえば `accay validate` では、Operation Directory を作ってから system validation と component validation を呼び、最後に Output でまとめる。
+
+ただし、CLI 自体に validation / regression の本体ロジックを置かない。
+
+### 5.4 Output の位置づけ
+
+Output は表示用の集約を行ってよい。
+
+ただし、Output が system / component の正本ファイルを直接読んで判断しない。Output は、各 harness / regression から渡された結果を Markdown / HTML / dashboard に整形する。
+
+`accay serve` は、原則として生成済み report を表示する薄い viewer とする。
 
 ## 6. 推奨パッケージ構成
 
-現在の実装は `cli.py` と `project.py` の最小骨格から始めている。MVP 実装では、以下のように責務単位で module を分ける。
+この構成は実装開始時の目安である。細かいファイル分割は実装中に変えてよいが、`system` と `component` の直接依存を避ける package 境界は維持する。
 
 ```text
 src/accay/
   cli.py
-  config.py
-  diagnostics.py
-  project.py
 
-  artifacts/
-    repository.py
-    scenario.py
-    trace.py
-    component.py
+  workspace/
+    config.py
+    init.py
+    skills.py
 
-  interfaces/
-    catalog.py
-    openapi_adapter.py
-    operations_adapter.py
+  system/
+    artifacts.py
+    validate.py
+    pack.py
+
+  operations/
+    directory.py
+    openapi.py
+    native.py
     schemas.py
 
-  validation/
-    orchestrator.py
-    system.py
-    component.py
-    trace.py
-
-  regression/
+  component/
+    artifacts.py
+    validate.py
+    review_pack.py
+    regression.py
     junit.py
-    engine.py
-    model.py
 
-  pack/
-    desk_debug.py
-    review.py
-    runs.py
-
-  reports/
-    markdown.py
-    html.py
-    summary.py
-
-  server/
-    app.py
+  output/
+    diagnostics.py
+    context.py
+    reports.py
+    server.py
 
   templates/
     skills/
 ```
 
-依存方向は `cli -> use case -> artifact / interface / validation / regression / report` とし、低レイヤーから CLI へ依存しない。
+### 6.1 package ごとの役割
 
-## 7. コマンド別シーケンス
+| package | 役割 |
+|---|---|
+| `workspace` | config、repository root、初期化、skill install を扱う |
+| `system` | scenario / sequence / trace の読み取り、system validation、desk-debug context 生成を扱う |
+| `operations` | OpenAPI / operations.yaml / schemas を operation contract として参照可能にする |
+| `component` | acceptance-scope / test-map / semantics / interfaces、review context、JUnit regression を扱う |
+| `output` | diagnostics、context、report、dashboard 表示を扱う |
+| `templates` | skill template や生成用テンプレートを置く |
 
-### 7.1 `accay init`
+### 6.2 実装上の余白
+
+この文書では `models.py` や class diagram を固定しない。
+
+実装上、内部型や dataclass が必要なら各 package の内側で定義してよい。ただし、それらを architecture の公開契約にはしない。
+
+## 7. テスト構成
+
+Accay 自身のテストについて、この基本設計では最小限の分類だけを決める。詳細なテストケース、fixture project の中身、pytest marker、golden file の比較ルールは、別のテストガイドラインで定義する。
+
+### 7.1 テスト分類
+
+| 分類 | 位置づけ | CI での扱い | 主な対象 |
+|---|---|---|---|
+| Contract Test | Accay の公開振る舞いを固定する長期保守テスト。受け入れテストはこの中核に含める。 | 必須 | CLI 挙動、exit code、生成ファイル、diagnostics、report / context の主要構造、ACCAY 受け入れ条件 |
+| Unit Test | 内部処理の局所的な正しさを確認する補助テスト。 | 必須 | parser、resolver、matcher、formatter など |
+| Probe Test | 調査・観測・再現実験のための一時テスト。 | 通常 CI から除外 | OpenAPI / JUnit XML の edge case 観察、実装中の仮説検証 |
+
+Contract Test は、ユーザーリポジトリに対して Accay CLI がどう振る舞うかを中心に置く。内部実装の形ではなく、公開された振る舞いを固定する。
+
+受け入れテストは、要件定義の受け入れ条件に直接対応する Contract Test として扱う。
+一方で Contract Test には、明示的な受け入れ条件に含まれない公開挙動も含めてよい。
+
+### 7.2 推奨テストディレクトリ
+
+```text
+tests/
+  contract/
+  unit/
+  probe/
+  fixtures/
+  golden/
+```
+
+| ディレクトリ | 役割 |
+|---|---|
+| `tests/contract/` | CLI と fixture project を使い、Accay の公開振る舞いを検証する |
+| `tests/unit/` | parser / resolver / matcher などの局所処理を検証する |
+| `tests/probe/` | 調査・観測用の一時テストを置く |
+| `tests/fixtures/` | 小さな疑似リポジトリ、JUnit XML、schema などを置く |
+| `tests/golden/` | report / context の主要構造を比較するための期待ファイルを置く |
+
+### 7.3 テスト方針
+
+Accay はユーザーリポジトリに導入される CLI ツールである。
+そのため、テストの中心は内部関数ではなく、小さな fixture project に対する CLI の振る舞いに置く。
+
+基本方針は以下とする。
+
+- Contract Test を最重要の長期保守テストにする
+- Unit Test は複雑な局所処理を補助的に支える
+- Probe Test は通常 CI の対象にしない
+- golden file は report / context の主要構造確認に限定する
+- run id、timestamp、絶対パスなどの揺れやすい値の扱いはテストガイドラインで定義する
+
+## 8. 代表シーケンス
+
+ここでは、コマンドごとに個別シーケンスを並べず、処理トポロジーが同じものをまとめて説明する。読み手は「どの部品がどの順に動くか」をここで把握し、個別コマンドの細部は CLI 実装側で確認する。
+
+| トポロジー | 対象コマンド |
+|---|---|
+| Workspace mutation | `accay init`, `accay install` |
+| Validation | `accay validate`, `accay system validate`, `accay component validate <component>` |
+| Context pack generation | `accay system pack desk-debug --scenario <scenario>`, `accay component pack review <component> --case <case-id>` |
+| Regression | `accay regression --junit <path>`, `accay component regression <component> --junit <path>` |
+| Serve | `accay serve` |
+
+### 8.1 Workspace mutation
+
+対象コマンド:
+
+```bash
+accay init
+accay install
+```
 
 ```mermaid
 sequenceDiagram
   actor User
-  participant CLI
-  participant ProjectInitializer
-  participant FS as File System
+  participant CLI as CLI & Workspace
+  participant FS as Repository Files
 
-  User->>CLI: accay init
-  CLI->>ProjectInitializer: init_project(root)
-  ProjectInitializer->>FS: ensure docs/acceptance directories
-  ProjectInitializer->>FS: ensure .accay directories
-  ProjectInitializer->>FS: ensure .agents/skills directory
-  alt .accay/config.yaml does not exist
-    ProjectInitializer->>FS: write default config
-  else config exists
-    ProjectInitializer-->>CLI: mark as existing
+  User->>CLI: accay init / accay install
+  CLI->>CLI: detect repository root
+  CLI->>CLI: load or prepare workspace config
+  CLI->>FS: create missing directories or files
+  CLI-->>User: summary and exit code
+```
+
+このトポロジーの目的は、Accay を導入できる workspace を準備することである。既存ファイルは不用意に上書きしない。
+
+- `init` は標準ディレクトリと default config を準備する
+- `install` は設定された skill install dir に `accay-*` skill を配置する
+
+### 8.2 Validation
+
+対象コマンド:
+
+```bash
+accay validate
+accay system validate
+accay component validate <component>
+```
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant CLI as CLI & Workspace
+  participant Directory as Operation Directory
+  participant SystemArtifacts as System Artifacts
+  participant SystemHarness as System Harness
+  participant ComponentArtifacts as Component Artifacts
+  participant ComponentHarness as Component Harness
+  participant Output as Output & Presentation
+
+  User->>CLI: validation command
+  CLI->>Directory: build operation directory as needed
+
+  opt system validation is included
+    CLI->>SystemArtifacts: load scenario / sequence / trace
+    CLI->>SystemHarness: validate system artifacts
+    SystemHarness->>Directory: lookup operation / schema references
+    SystemHarness-->>CLI: system diagnostics
   end
-  ProjectInitializer-->>CLI: created / existing paths
-  CLI-->>User: summary and exit 0
-```
 
-`accay init` は既存ファイルを上書きしない。設定変更は後続フェーズで別コマンドまたは手動編集として扱う。
-
-### 7.2 `accay install`
-
-```mermaid
-sequenceDiagram
-  actor User
-  participant CLI
-  participant Config
-  participant Installer as Skill Installer
-  participant Package as Bundled Templates
-  participant FS as File System
-
-  User->>CLI: accay install
-  CLI->>Config: load .accay/config.yaml
-  Config-->>CLI: skills.install_dir
-  CLI->>Installer: install skills
-  Installer->>Package: read accay-* skill templates
-  loop each skill
-    alt destination SKILL.md exists
-      Installer-->>CLI: mark as existing
-    else destination missing
-      Installer->>FS: write SKILL.md
-    end
+  opt component validation is included
+    CLI->>ComponentArtifacts: load component artifacts
+    CLI->>ComponentHarness: validate component artifacts
+    ComponentHarness->>Directory: lookup operation / schema references
+    ComponentHarness-->>CLI: component diagnostics
   end
-  Installer-->>CLI: created / existing paths
-  CLI-->>User: summary and exit 0
+
+  CLI->>Output: render diagnostics summary
+  Output-->>CLI: formatted output
+  CLI-->>User: diagnostics and exit code
 ```
 
-MVP では `--force` は持たない。既存 skill の更新戦略は後続フェーズで扱う。
+Validation の流れは、Operation Directory を必要に応じて作り、system validation と component validation を対象範囲に応じて実行する。コマンドごとの差は、どちらの validation を実行するかである。
 
-### 7.3 `accay validate`
+| コマンド | system validation | component validation |
+|---|---:|---:|
+| `accay validate` | する | 全 component に対してする |
+| `accay system validate` | する | しない |
+| `accay component validate <component>` | しない | 指定 component に対してする |
 
-```mermaid
-sequenceDiagram
-  actor User
-  participant CLI
-  participant Config
-  participant Repo as Artifact Repository
-  participant Catalog as Interface Catalog
-  participant Validator as Validation Orchestrator
-  participant Diagnostics
+### 8.3 Context pack generation
 
-  User->>CLI: accay validate
-  CLI->>Config: load config
-  CLI->>Repo: discover artifacts
-  Repo-->>CLI: scenarios, sequences, traces, components
-  CLI->>Catalog: build operation catalogs per component
-  Catalog-->>CLI: operations or diagnostics
-  CLI->>Validator: validate system and all components
-  Validator->>Validator: check scenario / sequence / trace references
-  Validator->>Validator: check operation and schema references
-  Validator->>Validator: validate trace input / output values
-  Validator->>Validator: check acceptance-scope and test-map consistency
-  Validator->>Diagnostics: collect errors, warnings, info
-  Diagnostics-->>CLI: summary
-  CLI-->>User: report diagnostics and exit code
+対象コマンド:
+
+```bash
+accay system pack desk-debug --scenario <scenario>
+accay component pack review <component> --case <case-id>
 ```
-
-終了コードは error があれば非ゼロ、warning / info のみならゼロを基本とする。CI policy の詳細は regression rule と合わせて後続実装で固定する。
-
-### 7.4 `accay system pack desk-debug --scenario <scenario>`
 
 ```mermaid
 sequenceDiagram
   actor AgentOrUser as Agent / User
-  participant CLI
-  participant Config
-  participant Repo as Artifact Repository
-  participant Catalog as Interface Catalog
-  participant Pack as Desk-debug Pack Builder
-  participant Runs as Run Directory
+  participant CLI as CLI & Workspace
+  participant Directory as Operation Directory
+  participant SystemArtifacts as System Artifacts
+  participant SystemHarness as System Harness
+  participant ComponentArtifacts as Component Artifacts
+  participant ComponentHarness as Component Harness
+  participant Regression as Component Regression
+  participant Output as Output & Presentation
 
-  AgentOrUser->>CLI: accay system pack desk-debug --scenario order-checkout
-  CLI->>Config: load config
-  CLI->>Repo: load scenario, sequence, related traces
-  CLI->>Repo: load component semantics and interfaces
-  CLI->>Catalog: build operation catalogs
-  CLI->>Pack: render context.md
-  Pack->>Runs: write .accay/runs/{run-id}/context.md
-  Pack-->>CLI: run id and path
+  AgentOrUser->>CLI: pack command
+  CLI->>Directory: load related operation contracts and schemas
+
+  alt system desk-debug pack
+    CLI->>SystemArtifacts: load scenario / sequence / existing trace
+    CLI->>SystemHarness: build desk-debug context
+    SystemHarness-->>CLI: context source
+  else component review pack
+    CLI->>ComponentArtifacts: load scope / test-map / semantics / interfaces
+    opt JUnit result is configured or passed
+      CLI->>Regression: read JUnit summary for context
+      Regression-->>CLI: test summary
+    end
+    CLI->>ComponentHarness: build review context
+    ComponentHarness-->>CLI: context source
+  end
+
+  CLI->>Output: write context.md
+  Output-->>CLI: .accay/runs/{run-id}/context.md
   CLI-->>AgentOrUser: context path
 ```
 
-context pack はエージェントが trace 草案を作るための入力であり、trace の正本ではない。
+system desk-debug pack と component review pack は、どちらも「必要な正本成果物を集めて、エージェント / 人間向けの `context.md` を生成する」処理である。
 
-### 7.5 `accay component pack review <component> --case <case-id>`
+違いは、正本として読む成果物である。相手側の情報を含める場合も、あくまで参考情報として扱う。
 
-```mermaid
-sequenceDiagram
-  actor Reviewer as Reviewer / Agent
-  participant CLI
-  participant Config
-  participant Repo as Artifact Repository
-  participant Catalog as Interface Catalog
-  participant JUnit as JUnit Result Reader
-  participant Pack as Review Pack Builder
-  participant Runs as Run Directory
+| コマンド | 正本として読むもの | 参考情報として読めるもの |
+|---|---|---|
+| `system pack desk-debug` | scenario / sequence / trace | component semantics / operation contract |
+| `component pack review` | scope / test-map / semantics / interfaces | 関連 trace / scenario / sequence、JUnit summary |
 
-  Reviewer->>CLI: accay component pack review order-domain --case ORD-001
-  CLI->>Config: load config
-  CLI->>Repo: load component artifacts
-  CLI->>Repo: load related scenarios, sequences, traces
-  CLI->>Catalog: build component operation catalog
-  opt junit paths configured or passed
-    CLI->>JUnit: read test results
-    JUnit-->>CLI: test result set
-  end
-  CLI->>Pack: render review context
-  Pack->>Runs: write context.md
-  Pack-->>CLI: run id and path
-  CLI-->>Reviewer: context path
+### 8.4 Regression
+
+対象コマンド:
+
+```bash
+accay regression --junit <path>
+accay component regression <component> --junit <path>
 ```
-
-レビュー結果そのものは `.accay/runs/{run-id}/review-report.md`、`decision.yaml`、`proposed/` に置く。ハーネスは提案ファイルを正本へ自動適用しない。
-
-### 7.6 `accay regression --junit <path>`
 
 ```mermaid
 sequenceDiagram
   actor User
-  participant CLI
-  participant Config
-  participant Repo as Artifact Repository
-  participant JUnit as JUnit Result Reader
-  participant Engine as Regression Engine
-  participant Reports as Report Renderer
-  participant FS as File System
+  participant CLI as CLI & Workspace
+  participant ComponentArtifacts as Component Artifacts
+  participant Regression as Component Regression
+  participant Output as Output & Presentation
 
-  User->>CLI: accay regression --junit reports/junit.xml
-  CLI->>Config: load config and regression rules
-  CLI->>Repo: load all component acceptance scopes and test maps
-  CLI->>JUnit: read and merge JUnit XML files
-  JUnit-->>CLI: test result set or duplicate testcase error
-  CLI->>Engine: match test-map against test result set
-  Engine->>Engine: aggregate case statuses
-  Engine->>Engine: apply accepted case failure rules
-  Engine-->>CLI: regression result
-  CLI->>Reports: render Markdown and HTML
-  Reports->>FS: write .accay/reports/*
-  CLI-->>User: summary, report paths, exit code
-```
-
-accepted case の failed / error / missing / skipped は、デフォルトで fail として扱う。
-
-### 7.7 `accay component regression <component> --junit <path>`
-
-```mermaid
-sequenceDiagram
-  actor User
-  participant CLI
-  participant Repo as Artifact Repository
-  participant JUnit as JUnit Result Reader
-  participant Engine as Regression Engine
-  participant Reports as Report Renderer
-
-  User->>CLI: accay component regression order-domain --junit reports/junit.xml
-  CLI->>Repo: load selected component scope and test-map
-  CLI->>JUnit: read JUnit XML files
-  CLI->>Engine: compute selected component regression
-  Engine-->>CLI: component regression result
-  CLI->>Reports: render component report
+  User->>CLI: regression command
+  CLI->>ComponentArtifacts: load selected component artifacts
+  CLI->>Regression: read JUnit XML and test-map
+  Regression->>Regression: match testcase by classname + name
+  Regression->>Regression: aggregate case-level results
+  Regression-->>CLI: regression result
+  CLI->>Output: render Markdown / HTML report
+  Output-->>CLI: report paths
   CLI-->>User: summary and exit code
 ```
 
-top-level regression と同じ集計ロジックを使い、対象 component のみを絞り込む。
+Regression は component 側の処理である。違いは対象 component の範囲だけで、system trace は直接読まない。
 
-### 7.8 `accay serve`
+| コマンド | 対象 |
+|---|---|
+| `accay regression --junit <path>` | 全 component |
+| `accay component regression <component> --junit <path>` | 指定 component |
+
+component regression は system trace を直接読まない。
+
+### 8.5 Serve
+
+対象コマンド:
+
+```bash
+accay serve
+```
 
 ```mermaid
 sequenceDiagram
   actor User
-  participant CLI
-  participant Config
-  participant Reports as Report Repository
-  participant Server as Dashboard Server
+  participant CLI as CLI & Workspace
+  participant Output as Output & Presentation
   participant Browser
 
   User->>CLI: accay serve
-  CLI->>Config: load report dirs
-  CLI->>Reports: load generated summaries
-  CLI->>Server: start local server
-  Browser->>Server: request dashboard
-  Server-->>Browser: HTML dashboard
+  CLI->>Output: start local viewer from generated reports
+  Browser->>Output: request dashboard
+  Output-->>Browser: HTML dashboard
+  CLI-->>User: server status
 ```
 
-MVP の dashboard はローカル確認用の薄い viewer とする。大規模な Web UI や編集機能は持たない。
+`serve` は生成済み report を見るための薄い viewer とする。
 
-## 8. Validation 設計
+MVP では、正本成果物の編集、test-map の承認 UI、proposal の適用 UI は持たない。
 
-Diagnostics は以下の severity を持つ。
+## 9. Validation / Regression / Pack の配置
 
-| severity | 意味 | 例 |
+各処理の置き場所は、正本として読む成果物の所有者に合わせる。
+
+| 処理 | 置き場所 | 理由 |
 |---|---|---|
-| error | コマンドの目的を達成できない不整合 | operation ID 重複、schema file 不存在、accepted case の mapped test missing |
-| warning | 機械的には継続可能だが確認が必要 | trace observation が空、non-accepted case の mapped test failure |
-| info | 参考情報 | unmapped test、生成済み report path |
+| system validation | `system` | scenario / sequence / trace を対象にするため |
+| component validation | `component` | scope / test-map / semantics / interfaces を対象にするため |
+| operation lookup / schema lookup | `operations` | system と component の共通境界にするため |
+| JUnit XML 照合 | `component` | test-map は component 正本であり、system trace とは独立して回すため |
+| context pack の整形 | `output` | Markdown 出力は表示責務に寄せるため |
+| context pack の材料選定 | `system` / `component` | 何を文脈に含めるかは対象領域ごとに違うため |
+| report / dashboard | `output` | 表示責務としてまとめるため |
 
-validation の出力は、CLI 表示と Markdown / HTML report の両方で使える共通モデルにする。
+## 10. MVP で明示的に扱わないもの
 
-## 9. レポート設計
-
-Markdown report はエージェントや CI log で読むことを優先する。HTML report は人間がブラウザで状況を把握することを優先する。
-
-| Report | 主な内容 | 出力先 |
-|---|---|---|
-| system validation report | scenario / sequence / trace / operation / schema の整合性 | `.accay/reports/markdown`, `.accay/reports/html` |
-| component validation report | scope / test-map / semantics / interfaces の整合性 | `.accay/reports/markdown`, `.accay/reports/html` |
-| regression report | case status、failed / missing / skipped、unmapped tests | `.accay/reports/markdown`, `.accay/reports/html` |
-| review context | 受け入れレビュー用の入力 pack | `.accay/runs/{run-id}/context.md` |
-| desk-debug context | 机上デバッグ用の入力 pack | `.accay/runs/{run-id}/context.md` |
-
-## 10. MVP の実装順序
-
-1. Config reader と diagnostics model を追加する。
-2. Artifact Repository で `docs/acceptance/` の読み取りを実装する。
-3. `operations.yaml` Adapter と JSON Schema Loader を実装する。
-4. OpenAPI Adapter を追加し、operation ID 重複検出を実装する。
-5. Component Validator と System Validator を実装する。
-6. JUnit Result Reader と Regression Engine を実装する。
-7. Markdown Report Renderer を実装する。
-8. HTML Report Renderer と `accay serve` を実装する。
-9. Context Pack Builder を実装する。
-10. CLI の planned command を実処理へ差し替える。
-
-## 11. MVP で扱わない境界
+以下は MVP の基本設計では扱わない。後続フェーズで必要性が出た場合に、改めて設計する。
 
 - エージェント実行そのもの
 - PR コメント投稿
 - コード自動修正
 - `test-map.yaml` の完全自動更新
+- 独自 patch DSL
 - OpenAPI の高度な差分解析
-- trace からのテスト生成
+- trace からのテスト自動生成
 - Smithy / AsyncAPI / Protobuf / gRPC adapter
 - `message` / `job` / `file` kind
 - function の実コード存在確認
 - 言語別静的解析
+- dashboard 上での正本編集
+
+## 11. 実装時の判断余地
+
+この基本設計は、実装を進めるための境界を決める文書である。
+
+以下は、実装フェーズで判断してよい。
+
+- 内部型を dataclass にするか dict ベースにするか
+- parser と validator を同じ module に置くか分けるか
+- diagnostics の具体フィールド
+- report の詳細レイアウト
+- context.md の詳細テンプレート
+- HTML dashboard を静的生成中心にするか、local server 側で組み立てるか
+- package 内部の helper module 分割
+
+ただし、以下は実装フェーズでも崩さない。
+
+- system と component の直接依存を作らない
+- system validation は component acceptance-scope / test-map を正本として読まない
+- component regression は system trace を正本として読まない
+- operation contract 参照は Operation Directory に寄せる
+- Output & Presentation に validation / regression の本体ロジックを置かない
