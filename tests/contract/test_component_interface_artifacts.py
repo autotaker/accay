@@ -87,9 +87,8 @@ def test_component_interface_artifacts_are_valid(component: str) -> None:
         kind = operation.get("kind")
         assert kind in {"cli", "function", "http"}
 
-        schema_refs = operation.get("schema_refs")
+        schema_refs = operation.get("schema_refs", {})
         assert isinstance(schema_refs, dict)
-        assert schema_refs
 
         if kind == "function":
             signature = operation.get("signature")
@@ -99,6 +98,31 @@ def test_component_interface_artifacts_are_valid(component: str) -> None:
 
         if kind == "cli":
             assert isinstance(operation.get("command"), str)
+            assert isinstance(operation.get("positional_arguments"), list)
+            assert isinstance(operation.get("parameters"), list)
+            assert isinstance(operation.get("environment_variables"), list)
+            assert isinstance(operation.get("standard_streams"), dict)
+            assert set(operation["standard_streams"]) == {"stdin", "stdout", "stderr"}
+            assert operation["standard_streams"]["stdin"] is None
+            assert operation["standard_streams"]["stdout"].get("media_type") in {
+                "text/plain",
+                "text/markdown",
+            }
+            assert operation["standard_streams"]["stderr"].get("media_type") == "text/plain"
+            assert isinstance(operation.get("exit_codes"), dict)
+            assert "success" in operation["exit_codes"]
+            assert "failure" in operation["exit_codes"]
+
+            for argument in operation["positional_arguments"]:
+                assert isinstance(argument, dict)
+                assert isinstance(argument.get("name"), str)
+                assert argument.get("arity") in {"one", "optional", "zero_or_more", "one_or_more"}
+
+            for parameter in operation["parameters"]:
+                assert isinstance(parameter, dict)
+                assert isinstance(parameter.get("name"), str)
+                assert isinstance(parameter.get("flags"), list)
+                assert parameter["flags"]
 
         for type_name, schema_ref in schema_refs.items():
             assert isinstance(type_name, str)

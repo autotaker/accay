@@ -263,9 +263,9 @@ MVP で機械的に読む必須項目は以下。
 
 - `component`
 - `operations.{operationId}.kind`
-- `operations.{operationId}.schema_refs`
 
-`schema_refs` は、operation の `signature` や CLI command 境界に現れる Accay 独自型名から JSON Schema への参照辞書である。
+`schema_refs` は、operation 境界に現れる Accay 独自型名から JSON Schema への参照辞書である。
+独自型がない operation では省略してよい。
 `Path` / `str` / `int` / `bool` などの標準的な型には schema 参照を付けない。
 1つの schema file には `$defs` で複数の独自型をまとめてよい。
 
@@ -282,8 +282,23 @@ kind 別の追加項目。
 | kind | 項目 | MVPでの扱い |
 |---|---|---|
 | `http` | `method`, `path`, `status_codes` | `status_codes` は検証対象 |
-| `cli` | `command`, `exit_codes` | `exit_codes` は検証対象 |
-| `function` | `signature`, `schema_refs`, `errors` | `signature` は型付きで書く。実コード検証はしない |
+| `cli` | `command`, `positional_arguments`, `parameters`, `environment_variables`, `standard_streams`, `exit_codes` | `command` は CLI help / usage 風の表記。`exit_codes` は検証対象 |
+| `function` | `signature`, `schema_refs`, `errors` | `signature` は型付きで書く。独自型は `schema_refs` で参照する。実コード検証はしない |
+
+`kind: cli` の `positional_arguments` / `parameters` / `environment_variables` は配列で表す。
+`positional_arguments` は順序が意味を持つため、辞書ではなく配列を正本にする。
+可変長 positional を扱う場合は `arity: zero_or_more` または `arity: one_or_more` とし、原則として最後の positional に限定する。
+
+CLI の `command` は実行ログではなく、標準的な help / usage に出る構文として書く。
+
+```yaml
+command: accay component regression <component> [--junit <path>]... [--root <path>]
+```
+
+標準入出力は `standard_streams` で表す。
+使用しない stream は `null` とする。
+使用する stream は `media_type` で表し、MVP では多くの CLI output を `text/plain` として扱う。
+stdout / stderr の完全な構造化 schema は必須にしない。
 
 ### 4.4 operationId の一意性
 

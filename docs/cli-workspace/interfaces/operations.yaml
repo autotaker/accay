@@ -2,10 +2,26 @@ component: cli-workspace
 operations:
   initWorkspace:
     kind: cli
-    command: accay init
-    schema_refs:
-      InitWorkspaceInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/InitWorkspaceInput
-      WorkspaceMutationResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/WorkspaceMutationResult
+    command: accay init [--root <path>]
+    positional_arguments: []
+    parameters:
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/plain
+        meaning: Human-readable command summary
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
@@ -13,10 +29,26 @@ operations:
       - 1
   installSkills:
     kind: cli
-    command: accay install
-    schema_refs:
-      InstallSkillsInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/InstallSkillsInput
-      WorkspaceMutationResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/WorkspaceMutationResult
+    command: accay install [--root <path>]
+    positional_arguments: []
+    parameters:
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/plain
+        meaning: Human-readable command summary
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
@@ -24,10 +56,26 @@ operations:
       - 1
   validateWorkspace:
     kind: cli
-    command: accay validate
-    schema_refs:
-      ValidateWorkspaceInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ValidateWorkspaceInput
-      ValidationCommandResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ValidationCommandResult
+    command: accay validate [--root <path>]
+    positional_arguments: []
+    parameters:
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/plain
+        meaning: Human-readable command summary
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
@@ -35,10 +83,26 @@ operations:
       - 1
   validateSystem:
     kind: cli
-    command: accay system validate
-    schema_refs:
-      ValidateSystemInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ValidateSystemInput
-      ValidationCommandResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ValidationCommandResult
+    command: accay system validate [--root <path>]
+    positional_arguments: []
+    parameters:
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/plain
+        meaning: Human-readable command summary
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
@@ -46,10 +110,31 @@ operations:
       - 1
   validateComponent:
     kind: cli
-    command: accay component validate <component>
-    schema_refs:
-      ValidateComponentInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ValidateComponentInput
-      ValidationCommandResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ValidationCommandResult
+    command: accay component validate <component> [--root <path>]
+    positional_arguments:
+    - name: component
+      type: string
+      required: true
+      arity: one
+      meaning: Target component name
+    parameters:
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/plain
+        meaning: Human-readable command summary
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
@@ -57,10 +142,34 @@ operations:
       - 1
   packDeskDebugContext:
     kind: cli
-    command: accay system pack desk-debug --scenario <scenario>
-    schema_refs:
-      PackDeskDebugContextInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/PackDeskDebugContextInput
-      ContextPackCommandResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ContextPackCommandResult
+    command: accay system pack desk-debug --scenario <scenario> [--root <path>]
+    positional_arguments: []
+    parameters:
+    - name: scenario
+      flags:
+      - --scenario
+      type: string
+      required: true
+      repeatable: false
+      value_name: scenario
+      meaning: Scenario ID to pack
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/markdown
+        meaning: Markdown context path and summary for agent or human review
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
@@ -68,10 +177,39 @@ operations:
       - 1
   packReviewContext:
     kind: cli
-    command: accay component pack review <component> --case <case-id>
-    schema_refs:
-      PackReviewContextInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/PackReviewContextInput
-      ContextPackCommandResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ContextPackCommandResult
+    command: accay component pack review <component> --case <case-id> [--root <path>]
+    positional_arguments:
+    - name: component
+      type: string
+      required: true
+      arity: one
+      meaning: Target component name
+    parameters:
+    - name: case
+      flags:
+      - --case
+      type: string
+      required: true
+      repeatable: false
+      value_name: case-id
+      meaning: Acceptance case ID to review
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/markdown
+        meaning: Markdown context path and summary for agent or human review
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
@@ -79,10 +217,34 @@ operations:
       - 1
   runRegression:
     kind: cli
-    command: accay regression --junit <path>
-    schema_refs:
-      RunRegressionInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/RunRegressionInput
-      RegressionCommandResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/RegressionCommandResult
+    command: accay regression [--junit <path>]... [--root <path>]
+    positional_arguments: []
+    parameters:
+    - name: junit
+      flags:
+      - --junit
+      type: array[string]
+      required: false
+      repeatable: true
+      value_name: path
+      meaning: JUnit XML path to include
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/plain
+        meaning: Human-readable command summary
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
@@ -90,10 +252,39 @@ operations:
       - 1
   runComponentRegression:
     kind: cli
-    command: accay component regression <component> --junit <path>
-    schema_refs:
-      RunComponentRegressionInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/RunComponentRegressionInput
-      RegressionCommandResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/RegressionCommandResult
+    command: accay component regression <component> [--junit <path>]... [--root <path>]
+    positional_arguments:
+    - name: component
+      type: string
+      required: true
+      arity: one
+      meaning: Target component name
+    parameters:
+    - name: junit
+      flags:
+      - --junit
+      type: array[string]
+      required: false
+      repeatable: true
+      value_name: path
+      meaning: JUnit XML path to include
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/plain
+        meaning: Human-readable command summary
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
@@ -101,10 +292,26 @@ operations:
       - 1
   serveReports:
     kind: cli
-    command: accay serve
-    schema_refs:
-      ServeReportsInput: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ServeReportsInput
-      ServeReportsResult: docs/cli-workspace/interfaces/schemas/cli-workspace.yaml#/$defs/ServeReportsResult
+    command: accay serve [--root <path>]
+    positional_arguments: []
+    parameters:
+    - name: root
+      flags:
+      - --root
+      type: string
+      required: false
+      repeatable: false
+      value_name: path
+      meaning: Repository root to operate on
+    environment_variables: []
+    standard_streams:
+      stdin: null
+      stdout:
+        media_type: text/plain
+        meaning: Human-readable command summary
+      stderr:
+        media_type: text/plain
+        meaning: User-facing errors and unexpected failures
     exit_codes:
       success:
       - 0
